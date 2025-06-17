@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <title>Messaging Queue Dashboard</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+</head>
+<body class="bg-light">
+    <div class="container py-4">
+        <h1 class="mb-4">Messaging Queue Dashboard</h1>
+
+        <div class="row mb-3">
+            <div class="col-md-4">
+                <div class="card text-center">
+                    <div class="card-header">Queue Depth</div>
+                    <div class="card-body">
+                        <h2 id="queueDepth">0</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-center">
+                    <div class="card-header">Processed Messages</div>
+                    <div class="card-body">
+                        <h2 id="processedCount">0</h2>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="card text-center">
+                    <div class="card-header">Error Rate</div>
+                    <div class="card-body">
+                        <h2 id="errorRate">0%</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <canvas id="statsChart" style="max-height: 300px;"></canvas>
+
+        <hr class="my-4" />
+
+        <h3>Produce New Message</h3>
+        <form id="produceForm" class="mb-4">
+            <div class="mb-3">
+                <label for="recipient" class="form-label">Recipient</label>
+                <input type="text" id="recipient" class="form-control" required />
+            </div>
+            <div class="mb-3">
+                <label for="content" class="form-label">Content</label>
+                <textarea id="content" class="form-control" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="type" class="form-label">Message Type</label>
+                <select id="type" class="form-select" required>
+                    <option value="0">SMS</option>
+                    <option value="1">Email</option>
+                    <option value="2">Push Notification</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Send Message</button>
+        </form>
+
+        <div id="produceResult"></div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        let statsChart;
+
+        async function fetchStats() {
+            const res = await fetch('/api/messages/stats');
+            return res.json();
+        }
+
+        // You might want to create a new API endpoint /api/queue/depth or
+        // estimate queue depth as total Pending messages from stats
+        async function fetchQueueDepth() {
+            const stats = await fetchStats();
+            return stats.Pending || 0;
+        }
+
+        async function renderStats() {
+            const stats = await fetchStats();
+            const queueDepth = await fetchQueueDepth();
+
+            document.getElementById("queueDepth").textContent = queueDepth;
+            document.getElementById("processedCount").textContent = stats.Processed || 0;
+
+            const errors = stats.Failed || 0;
+            const total = Object.values(stats).reduce((a, b) => a + b, 0);
+            document.getElementById("errorRate").textContent = total ? Math.round(errors / total * 100) + "%" : "0%";
+
+            const labels = Object.keys(stats);
+            const data = Object.values(stats);
+
+            if (!statsChart) {
+                const ctx = document.getElementById('statsChart').getContext('2d');
+                statsChart = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels,
+                        datasets: [{
+                            label: 'Messages by Status',
+                            data,
+                            backgroundColor: 'rgba(54, 162, 235, 0.7)'
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        scales: {
+                            y: { beginAtZero: true }
+                        }
+                    }
+                });
+            } else {
+                statsChart.data.labels = labels;
+                statsChart.data.datasets[0].data = data;
+                statsChart.update();
+            }
+        }
+
+        document.getElementById('produceForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const recipient = document.getElementById('recipient').value.trim();
+            const content = document.getElementById('content').value.trim();
+            const type = parseInt(document.getElementById('type').value, 10);
+
+            if (!recipient || !content) {
+                alert('Recipient and content are required.');
+                return;
+            }
+
+            const res = await fetch('/api/messages', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ recipient, content, type })
+            });
+
+            const resultDiv = document.getElementById('produceResult');
+            if (res.ok) {
+                const data = await res.json();
+                resultDiv.innerHTML = `<div class="alert alert-success">Message sent successfully! ID: ${data.id}</div>`;
+                e.target.reset();
+                renderStats(); // Refresh stats on new message
+            } else {
+                const error = await res.text();
+                resultDiv.innerHTML = `<div class="alert alert-danger">Error sending message: ${error}</div>`;
+            }
+        });
+
+        renderStats();
+
+        // Optional: refresh stats every 10 seconds
+        setInterval(renderStats, 10000);
+    </script>
+</body>
+</html>

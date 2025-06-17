@@ -1,0 +1,30 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35828.75 d17.13
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessagingQueueApp", "MessagingQueueApp\MessagingQueueApp.csproj", "{259C9B52-6B32-4B1A-B5B2-0D3A6E9C958E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MessagingQueueApp.Tests", "MessagingQueueApp.Tests\MessagingQueueApp.Tests.csproj", "{DDF9221F-C16A-453A-8491-CC6AFB4ACF1A}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{259C9B52-6B32-4B1A-B5B2-0D3A6E9C958E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{259C9B52-6B32-4B1A-B5B2-0D3A6E9C958E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{259C9B52-6B32-4B1A-B5B2-0D3A6E9C958E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{259C9B52-6B32-4B1A-B5B2-0D3A6E9C958E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DDF9221F-C16A-453A-8491-CC6AFB4ACF1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DDF9221F-C16A-453A-8491-CC6AFB4ACF1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DDF9221F-C16A-453A-8491-CC6AFB4ACF1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DDF9221F-C16A-453A-8491-CC6AFB4ACF1A}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E06BAC34-ED2E-44B9-9D02-B7BDCE61B6E5}
+	EndGlobalSection
+EndGlobal
