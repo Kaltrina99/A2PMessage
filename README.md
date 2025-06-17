@@ -31,21 +31,21 @@ A scalable, full-featured messaging queue processor built with **.NET 9**, featu
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/MessagingQueueApp.git
+git clone https://github.com/Kaltrina99/A2PMessage.git
 cd MessagingQueueApp
+```
 
-
-2. Configure PostgreSQL
+### 2. Configure PostgreSQL
 Make sure PostgreSQL is installed and running on your machine.
 
 Create the database:
 
-bash
-Copy
-Edit
+```bash
 psql -U postgres -c "CREATE DATABASE msgqueue;"
+````
 Run the schema script (you can run this inside psql or via any DB tool):
 
+```bash
 sql
 Copy
 Edit
@@ -58,12 +58,13 @@ CREATE TABLE messages (
     priority TEXT,
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
-3. Configure the Application
+```
+### 3. Configure the Application
 Edit the appsettings.json file in the project root to configure database and queue provider settings:
 
-json
-Copy
-Edit
+
+```bash
+json:
 {
   "ConnectionStrings": {
     "DefaultConnection": "Host=localhost;Username=postgres;Password=yourpassword;Database=msgqueue"
@@ -85,50 +86,49 @@ Important Configuration Options:
 Use "InMemory" for local development/testing with an in-memory queue.
 
 Use "PostgreSQL" to enable persistent queue backed by PostgreSQL database.
+```
 
-4. Environment Variables (Optional)
+### 4. Environment Variables (Optional)
 For security, you may want to override the connection string via environment variables instead of hardcoding passwords in appsettings.json.
 
 Set environment variables in your OS or Docker container:
-
-bash
-Copy
-Edit
+```bash
 # Linux/macOS
 export ConnectionStrings__DefaultConnection="Host=localhost;Username=postgres;Password=yourpassword;Database=msgqueue"
 
 # Windows PowerShell
 setx ConnectionStrings__DefaultConnection "Host=localhost;Username=postgres;Password=yourpassword;Database=msgqueue"
+```
 The application will automatically read environment variables prefixed with ConnectionStrings__.
 
-5. Build and Run the Application
+### 5. Build and Run the Application
 Restore dependencies, build, and start the app:
 
-bash
-Copy
-Edit
+```bash
 dotnet restore
 dotnet run --project MessagingQueueApp
+```
 The app will listen on default ports (usually https://localhost:57192).
 
 Access the Application
+```bash
 Swagger API Docs:
 https://localhost:57192/swagger
 
 Dashboard UI:
 https://localhost:57192/dashboard
+```
 
 Using Dapper in MessagingQueueApp
 Dapper provides fast, simple data access to your PostgreSQL database.
-
+```bash
 Example: Query message by ID
 csharp
-Copy
-Edit
 using var connection = new NpgsqlConnection(_connectionString);
 await connection.OpenAsync();
 
-const string sql = @"
+con
+st string sql = @"
     SELECT id, recipient, content, type, status, priority, created_at
     FROM messages
     WHERE id = @Id";
@@ -143,7 +143,10 @@ const string insertSql = @"
     VALUES (@Id, @Recipient, @Content, @Type, @Status, @Priority, @CreatedAt)";
 
 await connection.ExecuteAsync(insertSql, message);
+```
+
 API Endpoints
+```bash
 Method	Endpoint	Description
 POST	/api/messages	Enqueue a new message
 GET	/api/messages/{id}	Retrieve message by ID
@@ -152,13 +155,11 @@ GET	/api/messages/stats	Get message statistics by status
 GET	/api/messages/type-stats	Get message statistics by type
 GET	/api/messages/pending	Retrieve all pending messages
 POST	/api/messages/{id}/status	Update message status manually
+```
 
 Logging Configuration
 The app uses Serilog for logging. You can customize logging via appsettings.json:
-
-json
-Copy
-Edit
+```bash
 "Serilog": {
   "MinimumLevel": {
     "Default": "Information",
@@ -180,12 +181,11 @@ Edit
     }
   ]
 }
+```
 Logs will be written to console and rolling log files inside Logs/ folder.
 
 Running Tests
 Run all unit and integration tests with:
-
-bash
-Copy
-Edit
+```bash
 dotnet test ./MessagingQueueApp.Tests
+```
